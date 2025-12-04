@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soulmate - Trạm Sạc Cảm Xúc</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1', // Indigo
+                        secondary: '#8b5cf6', // Violet
+                        accent: '#f472b6', // Pink
+                        dark: '#0f172a',
+                        cream: '#fdfbf7',
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            scroll-behavior: smooth;
+            background-color: #fdfbf7; /* Cream background */
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Mesh Gradient Background */
+        .mesh-bg {
+            background-color: #ffdee9;
+            background-image: linear-gradient(0deg, #ffdee9 0%, #b5fffc 100%);
+            opacity: 0.3;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+        }
+
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Text Gradient */
+        .text-gradient {
+            background: linear-gradient(to right, #6366f1, #d946ef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-gradient-gold {
+            background: linear-gradient(to right, #d97706, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Bento Grid Hover */
+        .bento-item {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bento-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="selection:bg-indigo-200 selection:text-indigo-900">
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-30 animate-blob"></div>
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-30 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-30 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- Navbar (Floating Pill) -->
+    <nav class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-5xl">
+        <div class="glass-card rounded-full px-6 py-3 flex justify-between items-center shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/80">
+            <div class="flex items-center gap-2 cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                <span class="font-bold text-slate-800 tracking-tight">Soulmate</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                <a href="#feasibility" class="hover:text-indigo-600 transition-colors">Bối cảnh & Tiềm năng</a>
+                <a href="#why" class="hover:text-indigo-600 transition-colors">Tại sao chọn?</a>
+                <a href="#features" class="hover:text-indigo-600 transition-colors">Tính năng</a>
+                <a href="#pricing" class="hover:text-indigo-600 transition-colors">Bảng giá</a>
+            </div>
+
+            <button class="bg-slate-900 text-white px-5 py-2 rounded-full text-xs font-bold hover:bg-indigo-600 transition-colors shadow-lg flex items-center gap-2">
+                Tải App Beta <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="min-h-screen pt-32 pb-20 px-6 flex flex-col justify-center relative overflow-hidden">
+        <div class="container mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            
+            <!-- Left Content -->
+            <div class="space-y-8 relative z-10 text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-widest shadow-sm">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </span>
+                    Dự án PSI 2025
+                </div>
+
+                <h1 class="text-5xl lg:text-7xl font-serif font-bold leading-[1.1] text-slate-900">
+                    Nơi Cảm Xúc <br>
+                    <span class="text-gradient">Được Lắng Nghe</span>
+                </h1>
+
+                <p class="text-lg text-slate-600 leading-relaxed font-medium max-w-xl mx-auto lg:mx-0">
+                    Chúng ta thường mông lung về tương lai và lạc lõng trong hiện tại. 
+                    <strong>Soulmate</strong> không chỉ là một ứng dụng, đó là trạm dừng chân để bạn chữa lành tâm hồn và định vị bản thân trên hành trình trưởng thành.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <button class="group relative px-8 py-4 bg-slate-900 rounded-full text-white font-bold shadow-2xl hover:shadow-indigo-500/30 transition-all hover:-translate-y-1 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <span class="relative flex items-center gap-2">
+                            Trò chuyện với AI <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        </span>
+                    </button>
+                    <button class="px-8 py-4 bg-white rounded-full text-slate-700 font-bold shadow-lg border border-white hover:bg-indigo-50 transition-all flex items-center gap-2">
+                        <i data-lucide="play-circle" class="w-5 h-5 text-indigo-500"></i> Xem Video Demo
+                    </button>
+                </div>
+
+                <!-- Trusted By -->
+                <div class="pt-8 flex flex-col lg:flex-row items-center gap-4 border-t border-slate-200/60 mt-8 mx-auto lg:mx-0 max-w-sm lg:max-w-none">
+                    <div class="flex -space-x-3">
+                        <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User">
+                        <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" alt="User">
+                        <img class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Maria" alt="User">
+                    </div>
+                    <p class="text-sm text-slate-500">Được tin dùng bởi <span class="font-bold text-slate-800">500+ Sinh viên Phenikaa</span></p>
+                </div>
+            </div>
+
+            <!-- Right Visual (3D Phone Mockup) -->
+            <div class="relative flex justify-center lg:justify-end perspective-1000">
+                <!-- Floating Elements Behind -->
+                <div class="absolute top-1/4 -left-12 glass-card p-4 rounded-2xl shadow-xl animate-float z-20 hidden md:block">
+                    <i data-lucide="heart" class="w-6 h-6 text-red-500 fill-current"></i>
+                </div>
+                <div class="absolute bottom-1/4 -right-8 glass-card p-4 rounded-2xl shadow-xl animate-float-delayed z-20 hidden md:block">
+                    <i data-lucide="shield-check" class="w-6 h-6 text-green-500"></i>
+                </div>
+
+                <!-- Phone Body -->
+                <div class="relative w-[320px] h-[650px] bg-slate-900 rounded-[3rem] shadow-2xl border-[8px] border-slate-800 overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-700">
+                    <!-- Notch -->
+                    <div class="absolute top-0 inset-x-0 h-6 bg-slate-800 z-30 rounded-b-xl w-32 mx-auto"></div>
+                    
+                    <!-- Screen -->
+                    <div class="w-full h-full bg-slate-50 flex flex-col relative overflow-hidden">
+                        <!-- Top Gradient -->
+                        <div class="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-b-[3rem] z-0"></div>
+                        
+                        <!-- UI Content -->
+                        <div class="relative z-10 p-6 pt-12 flex flex-col h-full">
+                            <div class="flex justify-between items-center text-white mb-6">
+                                <div>
+                                    <p class="text-xs opacity-80">Thứ Ba, 24/10</p>
+                                    <h3 class="font-serif text-xl">Chào Yến Nhi 👋</h3>
+                                </div>
+                                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                    <i data-lucide="bell" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+
+                            <!-- Mood Tracker -->
+                            <div class="glass-card p-3 rounded-2xl mb-6 flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Cảm xúc</span>
+                                <div class="flex gap-2">
+                                    <span class="text-xl cursor-pointer hover:scale-125 transition">😊</span>
+                                    <span class="text-xl cursor-pointer hover:scale-125 transition">😔</span>
+                                    <span class="text-xl cursor-pointer hover:scale-125 transition">😠</span>
+                                </div>
+                            </div>
+
+                            <!-- Chat Area -->
+                            <div class="flex-1 space-y-4 overflow-hidden relative">
+                                <!-- Bot Message -->
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-purple-600 font-bold border border-purple-100">AI</div>
+                                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-xs text-slate-600 border border-slate-100 leading-relaxed">
+                                        Mình thấy hôm nay cậu có vẻ hơi mệt mỏi. Áp lực đồ án à? 🌿
+                                    </div>
+                                </div>
+                                <!-- User Message -->
+                                <div class="flex justify-end">
+                                    <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none text-xs shadow-md leading-relaxed">
+                                        Ừa, deadline dí quá cậu ơi...
+                                    </div>
+                                </div>
+                                <!-- Bot Action -->
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-purple-600 font-bold border border-purple-100">AI</div>
+                                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-xs text-slate-600 border border-slate-100 leading-relaxed">
+                                        Hít thở sâu nào. Mình gợi ý kết nối với <strong>Mentor Minh Nhật</strong> để được hướng dẫn nhé?
+                                        <button class="mt-2 w-full py-1.5 bg-indigo-50 text-indigo-600 rounded-lg font-bold hover:bg-indigo-100 transition-colors">Kết nối ngay</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Nav -->
+                            <div class="mt-auto pt-4 border-t border-slate-200 flex justify-around text-slate-400">
+                                <i data-lucide="home" class="w-6 h-6 hover:text-indigo-600 transition-colors"></i>
+                                <i data-lucide="message-circle" class="w-6 h-6 text-indigo-600"></i>
+                                <i data-lucide="users" class="w-6 h-6 hover:text-indigo-600 transition-colors"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- NEW SECTION: Feasibility & Pain Points (Storytelling) -->
+    <section id="feasibility" class="py-24 bg-white relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-indigo-50/50 to-white/0 pointer-events-none"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-indigo-600 font-bold text-xs uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full">Tính Khả Thi & Bối Cảnh</span>
+                <h2 class="text-3xl md:text-5xl font-serif font-bold text-slate-900 mt-4">Sóng Ngầm Dưới Giảng Đường</h2>
+                <p class="text-slate-500 mt-4 max-w-2xl mx-auto text-lg">
+                    Dự án ra đời từ chính những "nỗi đau" thầm lặng mà hàng nghìn sinh viên đang đối mặt mỗi ngày.
+                </p>
+            </div>
+
+            <!-- Story Grid: The Pain -->
+            <div class="grid md:grid-cols-3 gap-8 mb-20">
+                <!-- Story 1 -->
+                <div class="group relative rounded-[2rem] overflow-hidden shadow-lg h-96">
+                    <img src="https://images.unsplash.com/photo-1616165626245-c49c72cc9474?auto=format&fit=crop&w=600&q=80" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" alt="Stress">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8">
+                        <div class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white mb-4">
+                            <i data-lucide="moon" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">3 Giờ Sáng Cô Đơn</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            "Deadline dí sát, bạn bè ngủ hết. Mình muốn tâm sự nhưng sợ bị nói là 'yếu đuối'. AI là cứu cánh duy nhất lúc này."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Story 2 -->
+                <div class="group relative rounded-[2rem] overflow-hidden shadow-lg h-96 transform md:-translate-y-8">
+                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" alt="Career">
+                    <div class="absolute inset-0 bg-gradient-to-t from-indigo-900 via-indigo-900/60 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8">
+                        <div class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white mb-4">
+                            <i data-lucide="compass" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Sương Mù Hướng Nghiệp</h3>
+                        <p class="text-indigo-200 text-sm leading-relaxed">
+                            "CV trống rỗng. Học ngành này ra làm gì? Mình cần một Mentor đi trước chỉ đường chứ không phải lý thuyết suông."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Story 3 -->
+                <div class="group relative rounded-[2rem] overflow-hidden shadow-lg h-96">
+                    <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" alt="Peer Pressure">
+                    <div class="absolute inset-0 bg-gradient-to-t from-purple-900 via-purple-900/60 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-0 left-0 p-8">
+                        <div class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white mb-4">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Áp Lực Đồng Trang Lứa</h3>
+                        <p class="text-purple-200 text-sm leading-relaxed">
+                            "Lướt Facebook thấy ai cũng thành công. Mình cảm thấy nhỏ bé và thất bại. Mình cần sự công nhận và thấu hiểu."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Benchmark (Proven Model) -->
+            <div class="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-600 rounded-full blur-[100px] opacity-30"></div>
+                
+                <div class="grid md:grid-cols-2 gap-12 items-center relative z-10">
+                    <div>
+                        <span class="text-indigo-400 font-bold uppercase text-xs tracking-widest mb-2 block">Minh chứng toàn cầu</span>
+                        <h3 class="text-3xl md:text-4xl font-serif font-bold mb-6">Thế Giới Đã Làm Gì?</h3>
+                        <p class="text-slate-300 text-lg mb-8 leading-relaxed">
+                            Mô hình EdTech kết hợp Mental Health đã được kiểm chứng thành công trên toàn cầu. Tuy nhiên, Việt Nam vẫn thiếu một giải pháp <span class="text-white font-bold underline decoration-indigo-500">bản địa hóa</span>.
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4 bg-white/10 p-3 rounded-xl backdrop-blur-sm border border-white/10">
+                                <img src="https://ui-avatars.com/api/?name=Wysa&background=22c55e&color=fff" class="w-10 h-10 rounded-lg" alt="Wysa">
+                                <div>
+                                    <h4 class="font-bold">Wysa (Global)</h4>
+                                    <p class="text-xs text-slate-400">AI Chatbot hỗ trợ 500 triệu cuộc hội thoại.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-white/10 p-3 rounded-xl backdrop-blur-sm border border-white/10">
+                                <img src="https://ui-avatars.com/api/?name=ASU&background=f59e0b&color=fff" class="w-10 h-10 rounded-lg" alt="ASU">
+                                <div>
+                                    <h4 class="font-bold">Arizona State Univ.</h4>
+                                    <p class="text-xs text-slate-400">Ứng dụng "Hey Sunny" giảm 40% tỷ lệ bỏ học.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 rounded-3xl border border-white/10 shadow-2xl">
+                        <div class="flex items-start gap-4 mb-6">
+                            <div class="w-12 h-12 bg-white text-indigo-600 rounded-full flex items-center justify-center font-bold text-xl shadow-lg">S</div>
+                            <div>
+                                <h4 class="text-2xl font-bold">Cơ Hội Của Soulmate</h4>
+                                <p class="text-indigo-200 text-sm">Điểm khác biệt chiến lược</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-4">
+                            <li class="flex items-center gap-3">
+                                <i data-lucide="check-circle" class="text-green-400 w-5 h-5"></i>
+                                <span><strong>Giá sinh viên:</strong> Rẻ hơn 10 lần so với BetterHelp.</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <i data-lucide="check-circle" class="text-green-400 w-5 h-5"></i>
+                                <span><strong>Văn hóa Việt:</strong> AI hiểu tiếng lóng, áp lực thi cử VN.</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <i data-lucide="check-circle" class="text-green-400 w-5 h-5"></i>
+                                <span><strong>Hệ sinh thái:</strong> Liên kết trực tiếp với trường ĐH.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- USP Section: BENTO GRID (The Highlight) -->
+    <section id="why" class="py-24 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-indigo-600 font-bold text-xs uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full">Giá Trị Vượt Trội</span>
+                <h2 class="text-3xl md:text-5xl font-serif font-bold text-slate-900 mt-4">Tại Sao Soulmate Là "Chân Ái"?</h2>
+                <p class="text-slate-500 mt-4 max-w-2xl mx-auto">Sự kết hợp hoàn hảo giữa công nghệ và con người tạo nên vị thế độc tôn.</p>
+            </div>
+
+            <!-- Bento Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                
+                <!-- Card 1: Hybrid Model (Lớn nhất) -->
+                <div class="md:col-span-2 row-span-2 rounded-[2.5rem] bg-gradient-to-br from-indigo-600 to-violet-700 p-10 text-white relative overflow-hidden shadow-2xl bento-item group">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:opacity-20 transition-opacity duration-500"></div>
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div>
+                            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold mb-6 border border-white/20">
+                                <i data-lucide="crown" class="w-3 h-3 text-yellow-300"></i> Lợi Thế Cạnh Tranh #1
+                            </div>
+                            <h3 class="text-4xl font-serif font-bold mb-4">Mô Hình "Hybrid" Độc Đáo</h3>
+                            <p class="text-indigo-100 text-lg leading-relaxed max-w-md">
+                                Soulmate là cây cầu nối hoàn hảo giữa AI (Tốc độ, 0 đồng) và Mentor (Chiều sâu, Cảm xúc thật). Bạn không bao giờ phải chọn một trong hai.
+                            </p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mt-8">
+                            <div class="glass-card bg-white/10 border-white/10 p-4 rounded-2xl hover:bg-white/20 transition-colors cursor-pointer">
+                                <div class="flex items-center gap-2 mb-2 font-bold"><i data-lucide="bot" class="w-5 h-5"></i> AI Sơ Cứu</div>
+                                <p class="text-xs text-indigo-100 opacity-80">Hoạt động 24/7, phản hồi tức thì mọi lúc.</p>
+                            </div>
+                            <div class="glass-card bg-white/10 border-white/10 p-4 rounded-2xl hover:bg-white/20 transition-colors cursor-pointer">
+                                <div class="flex items-center gap-2 mb-2 font-bold"><i data-lucide="user-check" class="w-5 h-5"></i> Mentor</div>
+                                <p class="text-xs text-indigo-100 opacity-80">Giải quyết vấn đề chuyên sâu & định hướng.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Decor Image -->
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=500&q=80" class="absolute bottom-0 right-0 w-1/2 h-full object-cover opacity-20 mix-blend-overlay mask-image-linear-gradient" alt="Abstract">
+                </div>
+
+                <!-- Card 2: Local Insight -->
+                <div class="rounded-[2.5rem] glass-card p-8 bento-item relative overflow-hidden">
+                    <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-100 rounded-full blur-xl opacity-60"></div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6">
+                        <i data-lucide="map-pin" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Thấu Hiểu "Sân Nhà"</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">
+                        Sinh ra từ Phenikaa, dành cho Phenikaa. Chúng tôi hiểu rõ lịch thi và áp lực cụ thể tại đây hơn bất kỳ app ngoại lai nào.
+                    </p>
+                </div>
+
+                <!-- Card 3: Privacy -->
+                <div class="rounded-[2.5rem] glass-card p-8 bento-item">
+                    <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 mb-6">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">An Toàn Tuyệt Đối</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed mb-4">
+                        Mã hóa End-to-End. Nơi bạn được là chính mình mà không sợ định kiến hay lộ bí mật.
+                    </p>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded">100% Ẩn danh</span>
+                </div>
+
+                <!-- Card 4: Official Partner (Full Width Bottom) -->
+                <div class="md:col-span-3 rounded-[2.5rem] bg-slate-900 text-white p-8 flex flex-col md:flex-row items-center justify-between gap-6 bento-item relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+                    <div class="flex items-center gap-6 relative z-10">
+                        <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                            <i data-lucide="building-2" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-1">Bảo Chứng Chuyên Môn</h3>
+                            <p class="text-slate-400 text-sm">Đối tác chính thức của Phòng Tư vấn Tâm lý & Khoa chuyên môn.</p>
+                        </div>
+                    </div>
+                    <button class="relative z-10 px-6 py-3 bg-white text-slate-900 rounded-xl font-bold text-sm hover:bg-slate-200 transition-colors">
+                        Xem chứng nhận
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Section: Human Connection (Storytelling Style) -->
+    <section id="features" class="py-24 overflow-hidden">
+        <div class="container mx-auto px-6">
+            
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-16">
+                <!-- Visual -->
+                <div class="lg:w-1/2 relative group">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-blue-200 to-purple-200 rounded-[3rem] transform rotate-3 group-hover:rotate-6 transition-transform duration-500"></div>
+                    <div class="relative bg-white p-8 rounded-[2.5rem] shadow-xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="font-bold text-slate-400 uppercase text-xs tracking-widest">Thư Viện Mentor</h4>
+                            <i data-lucide="library" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+
+                        <!-- Mentor Cards Stack -->
+                        <div class="space-y-4">
+                            <!-- Card 1 -->
+                            <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all cursor-pointer group/card">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-12 h-12 rounded-full bg-white shadow-sm" alt="Mentor">
+                                <div>
+                                    <h5 class="font-bold text-slate-800 text-sm group-hover/card:text-indigo-600 transition-colors">Lan Anh <span class="font-normal text-slate-400 text-xs">| HR Manager</span></h5>
+                                    <p class="text-xs text-slate-500 mt-1 italic">"Cách mình vượt qua áp lực đồng trang lứa..."</p>
+                                </div>
+                            </div>
+
+                            <!-- Card 2 -->
+                            <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all cursor-pointer group/card">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" class="w-12 h-12 rounded-full bg-white shadow-sm" alt="Mentor">
+                                <div>
+                                    <h5 class="font-bold text-slate-800 text-sm group-hover/card:text-purple-600 transition-colors">Minh Nhật <span class="font-normal text-slate-400 text-xs">| Tech Lead</span></h5>
+                                    <p class="text-xs text-slate-500 mt-1 italic">"Khủng hoảng hiện sinh tuổi 20..."</p>
+                                </div>
+                            </div>
+
+                            <!-- Card 3 -->
+                            <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-lg transition-all cursor-pointer group/card">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Maria" class="w-12 h-12 rounded-full bg-white shadow-sm" alt="Mentor">
+                                <div>
+                                    <h5 class="font-bold text-slate-800 text-sm group-hover/card:text-green-600 transition-colors">TS. Hồng Hạnh <span class="font-normal text-slate-400 text-xs">| Giảng viên</span></h5>
+                                    <p class="text-xs text-slate-500 mt-1 italic">"Phương pháp học tập hiệu quả năm nhất..."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="lg:w-1/2">
+                    <span class="text-indigo-600 font-bold text-xs uppercase tracking-widest mb-2 block">Mạng Lưới Mentor</span>
+                    <h2 class="text-4xl lg:text-5xl font-serif font-bold text-slate-900 mb-6">Kết Nối Đa Chiều <br> Góc Nhìn Thực Tế</h2>
+                    <p class="text-slate-600 text-lg leading-relaxed mb-8">
+                        Không có một công thức chung cho thành công. Soulmate kết nối bạn với một cộng đồng Mentor đa dạng: từ những sinh viên xuất sắc (Peer Mentors) đến cựu sinh viên thành đạt và chuyên gia tâm lý. 
+                        <br><br>
+                        Dù bạn đang gặp khó khăn trong học tập, mông lung về định hướng hay khủng hoảng cá nhân, luôn có một ai đó ở đây với câu chuyện và kinh nghiệm thực tế để giúp bạn tìm ra lối đi riêng.
+                    </p>
+                    <a href="#pricing" class="inline-flex items-center gap-2 text-indigo-600 font-bold hover:gap-3 transition-all">
+                        Khám phá danh sách Mentor <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section id="roadmap" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-20">
+                <h2 class="text-3xl md:text-5xl font-serif font-bold">Tầm Nhìn & Lộ Trình</h2>
+                <p class="text-slate-400 mt-4">Hành trình biến ý tưởng thành hiện thực.</p>
+            </div>
+
+            <div class="relative max-w-4xl mx-auto">
+                <!-- Line -->
+                <div class="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500 via-purple-500 to-slate-800"></div>
+
+                <!-- Item 1 -->
+                <div class="flex flex-col md:flex-row gap-8 mb-16 relative group">
+                    <div class="md:w-1/2 md:text-right md:pr-12 pl-16 md:pl-0">
+                        <h3 class="text-2xl font-bold text-indigo-400 group-hover:scale-105 transition-transform origin-right">Giai Đoạn 1: MVP (2025)</h3>
+                        <p class="text-slate-400 mt-2 text-sm">Ra mắt tại Đại học Phenikaa. Hoàn thiện chatbot AI cơ bản và tính năng Booking Mentor. Đạt 5,000 người dùng đầu tiên.</p>
+                    </div>
+                    <div class="absolute left-8 md:left-1/2 -translate-x-1/2 w-4 h-4 bg-indigo-500 rounded-full border-4 border-slate-900 shadow-[0_0_15px_rgba(99,102,241,0.5)]"></div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="flex flex-col md:flex-row gap-8 mb-16 relative group">
+                    <div class="md:w-1/2 md:order-2 md:pl-12 pl-16">
+                        <h3 class="text-2xl font-bold text-purple-400 group-hover:scale-105 transition-transform origin-left">Giai Đoạn 2: Mở Rộng (2026)</h3>
+                        <p class="text-slate-400 mt-2 text-sm">Tích hợp AI phân tích giọng nói & video call. Mở rộng sang 5 trường Đại học khác tại Hà Nội. Phát triển kho học liệu Gamification.</p>
+                    </div>
+                    <div class="absolute left-8 md:left-1/2 -translate-x-1/2 w-4 h-4 bg-purple-500 rounded-full border-4 border-slate-900 shadow-[0_0_15px_rgba(168,85,247,0.5)]"></div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="flex flex-col md:flex-row gap-8 relative group">
+                    <div class="md:w-1/2 md:text-right md:pr-12 pl-16 md:pl-0">
+                        <h3 class="text-2xl font-bold text-green-400 group-hover:scale-105 transition-transform origin-right">Giai Đoạn 3: Hệ Sinh Thái (2027+)</h3>
+                        <p class="text-slate-400 mt-2 text-sm">Trở thành nền tảng EdTech & Mental Health số 1 cho sinh viên Việt Nam. Hợp tác với doanh nghiệp để tuyển dụng trực tiếp.</p>
+                    </div>
+                    <div class="absolute left-8 md:left-1/2 -translate-x-1/2 w-4 h-4 bg-green-500 rounded-full border-4 border-slate-900 animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.5)]"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-indigo-600 font-bold text-xs uppercase tracking-widest">Đầu tư cho bản thân</span>
+                <h2 class="text-3xl md:text-5xl font-serif font-bold text-slate-900 mt-4">Bảng Giá "Hạt Dẻ"</h2>
+                <p class="text-slate-500 mt-4">Chi phí chỉ bằng một cốc trà sữa.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Plan 1 -->
+                <div class="glass-card p-8 rounded-[2rem] hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative group border-t-4 border-indigo-500 bg-white">
+                    <div class="absolute top-6 right-6 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase">Sinh viên</div>
+                    <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center text-2xl mb-6">🐣</div>
+                    
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">Người Đồng Hành</h3>
+                    <p class="text-sm text-slate-500 mb-6">Học hỏi kinh nghiệm thực chiến từ "Senpai" khóa trên.</p>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                            <span class="text-sm text-slate-600">Gói lẻ</span>
+                            <span class="font-bold text-indigo-600">89k <span class="text-xs font-normal text-slate-400">/buổi</span></span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+                            <div>
+                                <span class="text-sm font-bold text-slate-800">Combo 10 lượt</span>
+                                <div class="text-[10px] text-green-600 font-bold">Tiết kiệm 191k</div>
+                            </div>
+                            <span class="font-bold text-indigo-700 text-xl">699k</span>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full py-4 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold hover:bg-indigo-600 hover:text-white transition-all">Đặt Lịch Ngay</button>
+                </div>
+
+                <!-- Plan 2 -->
+                <div class="p-8 rounded-[2rem] shadow-2xl relative overflow-hidden text-white bg-slate-900 group hover:-translate-y-2 transition-all duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 opacity-90"></div>
+                    <div class="relative z-10">
+                        <div class="absolute top-0 right-0 bg-white/20 px-3 py-1 rounded-bl-xl text-xs font-bold uppercase backdrop-blur-sm">Chuyên gia</div>
+                        <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl mb-6 backdrop-blur-sm">🎓</div>
+                        
+                        <h3 class="text-2xl font-bold mb-2">Người Dẫn Đường</h3>
+                        <p class="text-sm text-indigo-100 mb-6">Tham vấn chuyên sâu cùng Giảng viên & Chuyên gia.</p>
+                        
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between items-center p-3 bg-white/10 rounded-xl border border-white/10">
+                                <span class="text-sm text-indigo-100">Gói lẻ</span>
+                                <span class="font-bold text-white">179k <span class="text-xs font-normal text-indigo-200">/buổi</span></span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-white/20 border border-white/20 rounded-xl">
+                                <div>
+                                    <span class="text-sm font-bold text-white">Combo 10 lượt</span>
+                                    <div class="text-[10px] text-green-300 font-bold">Tiết kiệm 191k</div>
+                                </div>
+                                <span class="font-bold text-white text-xl">1.599k</span>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full py-4 rounded-xl bg-white text-indigo-700 font-bold hover:bg-indigo-50 transition-all shadow-lg">Kết Nối Chuyên Gia</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deep Quote -->
+    <section class="py-32 relative text-center">
+        <div class="container mx-auto px-6 relative z-10">
+            <i data-lucide="quote" class="w-12 h-12 text-indigo-300 mx-auto mb-8 opacity-50"></i>
+            <blockquote class="font-serif text-3xl md:text-5xl text-slate-800 leading-tight italic max-w-4xl mx-auto">
+                "Chữa lành không phải là cố gắng trở thành một phiên bản tốt hơn, <br class="hidden md:block">
+                mà là can đảm trở về với chính bản thể nguyên bản nhất của mình."
+            </blockquote>
+            <div class="w-16 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto mt-8 mb-4 rounded-full"></div>
+            <cite class="text-slate-500 not-italic tracking-widest text-xs uppercase font-bold">Soulmate Team - Gửi tới bạn</cite>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-12">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-md">S</div>
+                <span class="font-serif text-lg text-slate-800 font-bold">Soulmate</span>
+            </div>
+            <div class="text-center md:text-right text-slate-500 text-sm">
+                <p>&copy; 2025 Phenikaa University Project.</p>
+                <p class="mt-1 text-xs">GVHD: ThS. Phạm Thái Hòa | Leader: Trịnh Trọng Thiện</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
